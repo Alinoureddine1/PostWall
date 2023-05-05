@@ -28,15 +28,26 @@
                 </form>
             </div>
         </div>
-        <div>
-            <h1>Comments</h1>
-            {{range .}}
-            <div>{{.}}</div>
-            {{end}}
-        </div>
-        <div id="footer">
-            <p>PostWall &copy; 2023</p>
-        </div>
+
+        <form method="POST">
+            <div id="post">
+                <textarea name="comment" placeholder="What's on your mind?" required></textarea>
+
+                <div>
+                    <button type="submit">Post Note</button>
+                </div>
+            </div>
+
+            <div>
+                <h1>Comments</h1>
+                <form method="POST">
+                    {{range .}}
+                    <div>{{.}}</div>
+                    {{end}}
+            </div>
+            <div id="footer">
+                <p>PostWall &copy; 2023</p>
+            </div>
 </body>
 
 </html>
