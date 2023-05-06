@@ -1,14 +1,15 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PostWall</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-
-
+    <link rel="stylesheet" type="text/css" href="static/index.css">
 </head>
 
 <body>
-    <div id="container">
+    <div class="container">
         <div id="header">
             <h1>PostWall</h1>
         </div>
@@ -37,17 +38,18 @@
                     <button type="submit">Post Note</button>
                 </div>
             </div>
+        </form>
 
-            <div>
-                <h1>Comments</h1>
-                <form method="POST">
-                    {{range .}}
-                    <div>{{.}}</div>
-                    {{end}}
-            </div>
-            <div id="footer">
-                <p>PostWall &copy; 2023</p>
-            </div>
+        <div>
+            <h1>Notes</h1>
+            {{range .}}
+            <div class="comment">{{.}}</div>
+            {{end}}
+        </div>
+        <div id="footer">
+            <p>PostWall &copy; 2023</p>
+        </div>
+    </div>
 </body>
 
 </html>

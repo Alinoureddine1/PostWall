@@ -19,7 +19,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexGethandler).Methods("GET")
 	r.HandleFunc("/", indexPosthandler).Methods("POST")
-
+	fs := http.FileServer(http.Dir("./static/"))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
 	http.Handle("/", r)
 	http.ListenAndServe(":8080", nil)
 }
