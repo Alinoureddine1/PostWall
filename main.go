@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/go-redis/redis"
-	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
+
+	"github.com/go-redis/redis"
+	"github.com/gorilla/mux"
 )
 
 var client *redis.Client
@@ -16,15 +17,23 @@ func main() {
 	})
 	templates = template.Must(template.ParseGlob("templates/*.html"))
 	r := mux.NewRouter()
-	r.HandleFunc("/", indexhandler).Methods("GET")
+	r.HandleFunc("/", indexGethandler).Methods("GET")
+	r.HandleFunc("/", indexPosthandler).Methods("POST")
+
 	http.Handle("/", r)
 	http.ListenAndServe(":8080", nil)
 }
-func indexhandler(w http.ResponseWriter, r *http.Request) {
+func indexGethandler(w http.ResponseWriter, r *http.Request) {
 	comments, err := client.LRange("comments", 0, 10).Result()
 	if err != nil {
 		return
 	}
 	templates.ExecuteTemplate(w, "index.html", comments)
 
+}
+func indexPosthandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	comment := r.PostForm.Get("comment")
+	client.LPush("comments", comment)
+	http.Redirect(w, r, "/", 302)
 }
