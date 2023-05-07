@@ -1,11 +1,13 @@
 package main
 
 import (
+	"html/template"
+	"net/http"
+
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"html/template"
-	"net/http"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var client *redis.Client
@@ -20,10 +22,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", indexGethandler).Methods("GET")
 	r.HandleFunc("/", indexPosthandler).Methods("POST")
-	r.HandleFunc("/test", testGethandler).Methods("Get")
 
 	r.HandleFunc("/login", loginGethandler).Methods("GET")
 	r.HandleFunc("/login", loginPosthandler).Methods("POST")
+	r.HandleFunc("/register", registerGethandler).Methods("GET")
+	r.HandleFunc("/register", registerPosthandler).Methods("POST")
 	fs := http.FileServer(http.Dir("./static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
 	http.Handle("/", r)
@@ -48,19 +51,6 @@ func loginGethandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "login.html", nil)
 }
 
-func testGethandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "session")
-	untyped, ok := session.Values["username"]
-	if !ok {
-		return
-	}
-	username, ok := untyped.(string)
-	if !ok {
-		return
-	}
-	w.Write([]byte(username))
-}
-
 func loginPosthandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.PostForm.Get("username")
@@ -69,4 +59,18 @@ func loginPosthandler(w http.ResponseWriter, r *http.Request) {
 	session.Values["username"] = username
 	session.Values["password"] = password
 	session.Save(r, w)
+}
+func registerGethandler(w http.ResponseWriter, r *http.Request) {
+	templates.ExecuteTemplate(w, "register.html", nil)
+}
+func registerPosthandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	username := r.PostForm.Get("username")
+	password := r.PostForm.Get("password")
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 8)
+	if err != nil {
+		return
+	}
+	client.Set("user:"+username, hashedPassword, 0)
+	http.Redirect(w, r, "/login", 302)
 }
