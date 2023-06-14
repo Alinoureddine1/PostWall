@@ -1,2 +1,2 @@
 # PostWall
-A Go based web app to share notes between active users 
+A Go based web app to share messages 
